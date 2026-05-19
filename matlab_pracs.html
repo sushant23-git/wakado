@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Systems — MATLAB Practicals</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --card: #161a22;
+    --border: #1e2430;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #a8ff3e;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+    --keyword: #ff79c6;
+    --func: #50fa7b;
+    --string: #f1fa8c;
+    --comment: #6272a4;
+    --number: #bd93f9;
+    --operator: #ff6b35;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,229,255,0.05) 0%, transparent 100%);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0,229,255,0.3);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* Nav pills */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 32px;
+  }
+
+  .nav a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .nav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
+
+  /* Main layout */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* Prac card */
+  .prac {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .prac:nth-child(1) { animation-delay: 0.05s; }
+  .prac:nth-child(2) { animation-delay: 0.10s; }
+  .prac:nth-child(3) { animation-delay: 0.15s; }
+  .prac:nth-child(4) { animation-delay: 0.20s; }
+  .prac:nth-child(5) { animation-delay: 0.25s; }
+  .prac:nth-child(6) { animation-delay: 0.30s; }
+  .prac:nth-child(7) { animation-delay: 0.35s; }
+  .prac:nth-child(8) { animation-delay: 0.40s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .prac-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .prac-header:hover { background: rgba(0,229,255,0.03); }
+
+  .prac-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .prac-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.2);
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .prac-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .prac-trick {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    margin-top: 4px;
+    opacity: 0.85;
+  }
+
+  .chevron {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .prac.open .chevron { transform: rotate(180deg); }
+
+  .prac-body {
+    display: none;
+    padding: 0;
+  }
+
+  .prac.open .prac-body { display: block; }
+
+  /* Code block */
+  .code-wrap {
+    position: relative;
+  }
+
+  .code-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--code-bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .copy-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--accent3); border-color: var(--accent3); }
+
+  pre {
+    margin: 0;
+    padding: 24px 24px;
+    background: var(--code-bg);
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  /* Syntax tokens */
+  .k  { color: var(--keyword); font-weight: 600; }   /* keywords */
+  .f  { color: var(--func); }                          /* functions */
+  .s  { color: var(--string); }                        /* strings */
+  .c  { color: var(--comment); font-style: italic; }  /* comments */
+  .n  { color: var(--number); }                        /* numbers */
+  .o  { color: var(--operator); }                      /* operators */
+  .v  { color: #8be9fd; }                              /* variables */
+  .p  { color: var(--text); }                          /* plain */
+
+  /* Info box */
+  .info-box {
+    margin: 0;
+    padding: 16px 28px;
+    background: rgba(168,255,62,0.04);
+    border-top: 1px solid rgba(168,255,62,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    line-height: 1.6;
+  }
+
+  .info-box strong { color: #fff; font-weight: 600; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    header, main { padding-left: 20px; padding-right: 20px; }
+    h1 { font-size: 2rem; }
+    pre { font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="tag">EEE / Control Systems</div>
+    <h1>MATLAB<br><span>Practicals</span></h1>
+    <p class="subtitle">// Complete, run-ready code for all 8 practicals.<br>// Click any card to expand. Copy with one click.</p>
+    <nav class="nav">
+      <a href="#p1">P1 Transfer Functions</a>
+      <a href="#p2">P2 Step Response</a>
+      <a href="#p3">P3 Steady State</a>
+      <a href="#p4">P4 Parameter Variation</a>
+      <a href="#p5">P5 Root Locus</a>
+      <a href="#p6">P6 Lead Compensation</a>
+      <a href="#p7">P7 Bode Plot</a>
+      <a href="#p8">P8 State Space</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- PRAC 1 -->
+  <div class="prac open" id="p1">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 01</span>
+          <span class="prac-title">Individual & Combined Transfer Functions</span>
+        </div>
+        <div class="prac-trick">// series() · parallel() · feedback()</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">s</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="s">'s'</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Individual Transfer Functions ---'</span><span class="p">);</span>
+<span class="v">G1</span> <span class="o">=</span> <span class="n">1</span><span class="o">/</span><span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">1</span><span class="p">)</span>
+<span class="v">G2</span> <span class="o">=</span> <span class="n">2</span><span class="o">/</span><span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">2</span><span class="p">)</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Overall Transfer Function (Series) ---'</span><span class="p">);</span>
+<span class="f">series</span><span class="p">(</span><span class="v">G1</span><span class="p">,</span> <span class="v">G2</span><span class="p">)</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Overall Transfer Function (Parallel) ---'</span><span class="p">);</span>
+<span class="f">parallel</span><span class="p">(</span><span class="v">G1</span><span class="p">,</span> <span class="v">G2</span><span class="p">)</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Overall Transfer Function (Feedback) ---'</span><span class="p">);</span>
+<span class="f">feedback</span><span class="p">(</span><span class="v">G1</span><span class="p">,</span> <span class="v">G2</span><span class="p">)</span></pre>
+      </div>
+      <div class="info-box"><strong>Note:</strong> No changes needed — this prac is already complete and runs as-is.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 2 -->
+  <div class="prac" id="p2">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 02</span>
+          <span class="prac-title">Step Response</span>
+        </div>
+        <div class="prac-trick">// Fixed: 2*z*w (missing multiplication operators)</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">w</span> <span class="o">=</span> <span class="n">5</span><span class="p">;</span>
+<span class="v">z</span> <span class="o">=</span> <span class="n">0.5</span><span class="p">;</span>
+
+<span class="v">sys</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">, [</span><span class="n">1</span>  <span class="n">2</span><span class="o">*</span><span class="v">z</span><span class="o">*</span><span class="v">w</span>  <span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">]);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Transfer Function:'</span><span class="p">);</span>
+<span class="v">sys</span>
+
+<span class="p">[</span><span class="v">y</span><span class="p">,</span> <span class="v">t</span><span class="p">]</span> <span class="o">=</span> <span class="f">step</span><span class="p">(</span><span class="v">sys</span><span class="p">);</span>
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">plot</span><span class="p">(</span><span class="v">t</span><span class="p">,</span> <span class="v">y</span><span class="p">,</span> <span class="s">'k'</span><span class="p">,</span> <span class="s">'LineWidth'</span><span class="p">,</span> <span class="n">3</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Unit Step Response'</span><span class="p">);</span>
+<span class="f">xlabel</span><span class="p">(</span><span class="s">'Time'</span><span class="p">);</span>
+<span class="f">ylabel</span><span class="p">(</span><span class="s">'Amplitude'</span><span class="p">);</span>
+
+<span class="v">i</span> <span class="o">=</span> <span class="f">stepinfo</span><span class="p">(</span><span class="v">sys</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Unit Step Response Parameters ---'</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Rise Time     = %.4f sec\n'</span><span class="p">,</span> <span class="v">i</span><span class="p">.</span><span class="v">RiseTime</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Peak Time     = %.4f sec\n'</span><span class="p">,</span> <span class="v">i</span><span class="p">.</span><span class="v">PeakTime</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Settling Time = %.4f sec\n'</span><span class="p">,</span> <span class="v">i</span><span class="p">.</span><span class="v">SettlingTime</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Overshoot     = %.2f %%\n'</span><span class="p">,</span>   <span class="v">i</span><span class="p">.</span><span class="v">Overshoot</span><span class="p">);</span></pre>
+      </div>
+      <div class="info-box"><strong>Fix applied:</strong> <code>2zw</code> → <code>2*z*w</code> and <code>Kw^2</code> → <code>K*w^2</code> (MATLAB requires explicit <code>*</code> for multiplication between variables).</div>
+    </div>
+  </div>
+
+  <!-- PRAC 3 -->
+  <div class="prac" id="p3">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 03</span>
+          <span class="prac-title">Steady State Errors</span>
+        </div>
+        <div class="prac-trick">// Fixed: s*G and s^2*G (missing * operators)</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="f">syms</span> <span class="v">s</span><span class="p">;</span>
+<span class="v">G_s</span> <span class="o">=</span> <span class="n">10</span> <span class="o">/</span> <span class="p">(</span><span class="v">s</span> <span class="o">*</span> <span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">2</span><span class="p">));</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Symbolic TF:'</span><span class="p">);</span> <span class="f">pretty</span><span class="p">(</span><span class="v">G_s</span><span class="p">);</span>
+
+<span class="v">s</span>  <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="s">'s'</span><span class="p">);</span>
+<span class="v">G</span>  <span class="o">=</span> <span class="n">10</span> <span class="o">/</span> <span class="p">(</span><span class="v">s</span> <span class="o">*</span> <span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">2</span><span class="p">));</span>
+<span class="v">kp</span> <span class="o">=</span> <span class="f">dcgain</span><span class="p">(</span><span class="v">G</span><span class="p">);</span>
+<span class="v">kv</span> <span class="o">=</span> <span class="f">dcgain</span><span class="p">(</span><span class="v">s</span> <span class="o">*</span> <span class="v">G</span><span class="p">);</span>
+<span class="v">ka</span> <span class="o">=</span> <span class="f">dcgain</span><span class="p">(</span><span class="v">s</span><span class="o">^</span><span class="n">2</span> <span class="o">*</span> <span class="v">G</span><span class="p">);</span>
+
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'\nSTEADY STATE ANALYSIS\n\n'</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Position error constant    = %g\n'</span><span class="p">,</span> <span class="v">kp</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Velocity error constant    = %g\n'</span><span class="p">,</span> <span class="v">kv</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Acceleration error const   = %g\n\n'</span><span class="p">,</span> <span class="v">ka</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Unit Step error            = %g\n'</span><span class="p">,</span> <span class="n">1</span><span class="o">/</span><span class="p">(</span><span class="n">1</span> <span class="o">+</span> <span class="v">kp</span><span class="p">));</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Ramp error                 = %g\n'</span><span class="p">,</span> <span class="n">1</span><span class="o">/</span><span class="v">kv</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Parabolic error            = %g\n'</span><span class="p">,</span> <span class="n">1</span><span class="o">/</span><span class="v">ka</span><span class="p">);</span></pre>
+      </div>
+      <div class="info-box"><strong>Fix applied:</strong> <code>sG</code> → <code>s*G</code> and <code>s^2G</code> → <code>s^2*G</code>. The "No IF" trick works because <code>1/Inf = 0</code> naturally in MATLAB — no <code>isinf()</code> checks needed.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 4 -->
+  <div class="prac" id="p4">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 04</span>
+          <span class="prac-title">Parameter Variation</span>
+        </div>
+        <div class="prac-trick">// Fixed: K*w^2, 2*z*w, 2*Z*w, 2*z*W (all multiplication)</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">w</span> <span class="o">=</span> <span class="n">5</span><span class="p">;</span>
+<span class="v">z</span> <span class="o">=</span> <span class="n">0.5</span><span class="p">;</span>
+
+<span class="c">% --- LOOP 1: Vary Gain K ---</span>
+<span class="f">figure</span><span class="p">;</span> <span class="f">hold</span> <span class="k">on</span><span class="p">;</span>
+<span class="k">for</span> <span class="v">K</span> <span class="o">=</span> <span class="p">[</span><span class="n">1</span> <span class="n">5</span> <span class="n">10</span><span class="p">]</span>
+    <span class="f">step</span><span class="p">(</span><span class="f">tf</span><span class="p">(</span><span class="v">K</span> <span class="o">*</span> <span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">, [</span><span class="n">1</span>  <span class="n">2</span><span class="o">*</span><span class="v">z</span><span class="o">*</span><span class="v">w</span>  <span class="v">K</span><span class="o">*</span><span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">]));</span>
+<span class="k">end</span>
+<span class="f">legend</span><span class="p">(</span><span class="s">'K=1'</span><span class="p">,</span> <span class="s">'K=5'</span><span class="p">,</span> <span class="s">'K=10'</span><span class="p">);</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Effect of Gain K'</span><span class="p">);</span> <span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+
+<span class="c">% --- LOOP 2: Vary Damping Ratio Z ---</span>
+<span class="f">figure</span><span class="p">;</span> <span class="f">hold</span> <span class="k">on</span><span class="p">;</span>
+<span class="k">for</span> <span class="v">Z</span> <span class="o">=</span> <span class="p">[</span><span class="n">0.2</span> <span class="n">0.5</span> <span class="n">0.8</span><span class="p">]</span>
+    <span class="f">step</span><span class="p">(</span><span class="f">tf</span><span class="p">(</span><span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">, [</span><span class="n">1</span>  <span class="n">2</span><span class="o">*</span><span class="v">Z</span><span class="o">*</span><span class="v">w</span>  <span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">]));</span>
+<span class="k">end</span>
+<span class="f">legend</span><span class="p">(</span><span class="s">'\zeta=0.2'</span><span class="p">,</span> <span class="s">'\zeta=0.5'</span><span class="p">,</span> <span class="s">'\zeta=0.8'</span><span class="p">);</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Effect of Damping Ratio \zeta'</span><span class="p">);</span> <span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+
+<span class="c">% --- LOOP 3: Vary Natural Frequency Wn ---</span>
+<span class="f">figure</span><span class="p">;</span> <span class="f">hold</span> <span class="k">on</span><span class="p">;</span>
+<span class="k">for</span> <span class="v">W</span> <span class="o">=</span> <span class="p">[</span><span class="n">2</span> <span class="n">5</span> <span class="n">8</span><span class="p">]</span>
+    <span class="f">step</span><span class="p">(</span><span class="f">tf</span><span class="p">(</span><span class="v">W</span><span class="o">^</span><span class="n">2</span><span class="p">, [</span><span class="n">1</span>  <span class="n">2</span><span class="o">*</span><span class="v">z</span><span class="o">*</span><span class="v">W</span>  <span class="v">W</span><span class="o">^</span><span class="n">2</span><span class="p">]));</span>
+<span class="k">end</span>
+<span class="f">legend</span><span class="p">(</span><span class="s">'\omega_n=2'</span><span class="p">,</span> <span class="s">'\omega_n=5'</span><span class="p">,</span> <span class="s">'\omega_n=8'</span><span class="p">);</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Effect of Natural Frequency \omega_n'</span><span class="p">);</span> <span class="f">grid</span> <span class="k">on</span><span class="p">;</span></pre>
+      </div>
+      <div class="info-box"><strong>Fix applied:</strong> All implicit multiplications made explicit. Loop 1 denominator uses <code>K*w^2</code> (varying with K). Loops 2 & 3 keep <code>w^2</code> or <code>W^2</code> constant as appropriate.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 5 -->
+  <div class="prac" id="p5">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 05</span>
+          <span class="prac-title">Root Locus</span>
+        </div>
+        <div class="prac-trick">// Complete — click the plot to select gain K</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">G</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="n">1</span><span class="p">, [</span><span class="n">1</span> <span class="n">7</span> <span class="n">10</span> <span class="n">0</span><span class="p">]);</span>
+
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">rlocus</span><span class="p">(</span><span class="v">G</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Root Locus'</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'Click a point on the root locus plot to select gain K...'</span><span class="p">);</span>
+<span class="p">[</span><span class="v">K</span><span class="p">,</span> <span class="v">p</span><span class="p">]</span> <span class="o">=</span> <span class="f">rlocfind</span><span class="p">(</span><span class="v">G</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'Selected Gain K:'</span><span class="p">);</span> <span class="f">disp</span><span class="p">(</span><span class="v">K</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Closed-Loop Poles:'</span><span class="p">);</span> <span class="f">disp</span><span class="p">(</span><span class="v">p</span><span class="p">);</span>
+
+<span class="v">T</span> <span class="o">=</span> <span class="f">feedback</span><span class="p">(</span><span class="v">K</span> <span class="o">*</span> <span class="v">G</span><span class="p">,</span> <span class="n">1</span><span class="p">);</span>
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">step</span><span class="p">(</span><span class="v">T</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Closed-Loop Step Response'</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'Step Response Parameters:'</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="f">stepinfo</span><span class="p">(</span><span class="v">T</span><span class="p">));</span></pre>
+      </div>
+      <div class="info-box"><strong>Note:</strong> <code>rlocfind(G)</code> pauses execution and waits for you to click the root locus plot. MATLAB highlights the selected point and returns the corresponding K and closed-loop poles.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 6 -->
+  <div class="prac" id="p6">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 06</span>
+          <span class="prac-title">Lead Compensation</span>
+        </div>
+        <div class="prac-trick">// Complete — series(Gc,G) + stepinfo comparison</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+
+<span class="v">G</span>  <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="n">10</span><span class="p">, [</span><span class="n">1</span> <span class="n">1</span> <span class="n">0</span><span class="p">]);</span>
+<span class="v">Gc</span> <span class="o">=</span> <span class="n">0.9</span> <span class="o">*</span> <span class="f">tf</span><span class="p">([</span><span class="n">1</span> <span class="n">1</span><span class="p">], [</span><span class="n">1</span> <span class="n">3</span><span class="p">]);</span>  <span class="c">% Lead compensator</span>
+
+<span class="v">T1</span> <span class="o">=</span> <span class="f">feedback</span><span class="p">(</span><span class="v">G</span><span class="p">,</span> <span class="n">1</span><span class="p">);</span>
+<span class="v">T2</span> <span class="o">=</span> <span class="f">feedback</span><span class="p">(</span><span class="f">series</span><span class="p">(</span><span class="v">Gc</span><span class="p">,</span> <span class="v">G</span><span class="p">),</span> <span class="n">1</span><span class="p">);</span>
+
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">step</span><span class="p">(</span><span class="v">T1</span><span class="p">,</span> <span class="s">'r'</span><span class="p">,</span> <span class="v">T2</span><span class="p">,</span> <span class="s">'b'</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">legend</span><span class="p">(</span><span class="s">'Uncompensated'</span><span class="p">,</span> <span class="s">'Lead Compensated'</span><span class="p">);</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Step Response Comparison'</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Uncompensated ---'</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="f">stepinfo</span><span class="p">(</span><span class="v">T1</span><span class="p">));</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Lead Compensated ---'</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="f">stepinfo</span><span class="p">(</span><span class="v">T2</span><span class="p">));</span></pre>
+      </div>
+      <div class="info-box"><strong>Note:</strong> Red = uncompensated, Blue = lead compensated. Lead compensator <code>Gc</code> adds a zero at s=−1 and a pole at s=−3, improving phase margin and transient response.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 7 -->
+  <div class="prac" id="p7">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 07</span>
+          <span class="prac-title">Bode Plot</span>
+        </div>
+        <div class="prac-trick">// Added stability verdict from margins</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">G</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="n">100</span><span class="p">, [</span><span class="n">1</span> <span class="n">22</span> <span class="n">40</span> <span class="n">0</span><span class="p">]);</span>
+
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">bode</span><span class="p">(</span><span class="v">G</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Bode Plot'</span><span class="p">);</span>
+
+<span class="p">[</span><span class="v">GM</span><span class="p">,</span> <span class="v">PM</span><span class="p">,</span> <span class="v">Wcg</span><span class="p">,</span> <span class="v">Wcp</span><span class="p">]</span> <span class="o">=</span> <span class="f">margin</span><span class="p">(</span><span class="v">G</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Stability Margins ---'</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Gain Margin (dB):'</span><span class="p">);</span>       <span class="f">disp</span><span class="p">(</span><span class="n">20</span><span class="o">*</span><span class="f">log10</span><span class="p">(</span><span class="v">GM</span><span class="p">));</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Phase Margin (deg):'</span><span class="p">);</span>     <span class="f">disp</span><span class="p">(</span><span class="v">PM</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Phase Crossover (rad/s):'</span><span class="p">);</span><span class="f">disp</span><span class="p">(</span><span class="v">Wcg</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Gain Crossover  (rad/s):'</span><span class="p">);</span><span class="f">disp</span><span class="p">(</span><span class="v">Wcp</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="v">GM</span> <span class="o">></span> <span class="n">1</span> <span class="o">&&</span> <span class="v">PM</span> <span class="o">></span> <span class="n">0</span>
+    <span class="f">disp</span><span class="p">(</span><span class="s">'System is STABLE'</span><span class="p">);</span>
+<span class="k">else</span>
+    <span class="f">disp</span><span class="p">(</span><span class="s">'System is UNSTABLE'</span><span class="p">);</span>
+<span class="k">end</span></pre>
+      </div>
+      <div class="info-box"><strong>Note:</strong> <code>margin(G)</code> returns GM as a ratio (not dB), so <code>20*log10(GM)</code> converts it. Stability requires GM &gt; 1 (i.e., &gt; 0 dB) AND PM &gt; 0°.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 8 -->
+  <div class="prac" id="p8">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 08</span>
+          <span class="prac-title">State Space ↔ Transfer Function</span>
+        </div>
+        <div class="prac-trick">// Complete — tf2ss → ss → ss2tf round-trip</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+
+<span class="v">n</span> <span class="o">=</span> <span class="p">[</span><span class="n">1</span> <span class="n">3</span><span class="p">];</span>
+<span class="v">d</span> <span class="o">=</span> <span class="p">[</span><span class="n">1</span> <span class="n">5</span> <span class="n">6</span><span class="p">];</span>
+<span class="v">G</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="v">n</span><span class="p">,</span> <span class="v">d</span><span class="p">);</span>
+
+<span class="p">[</span><span class="v">A</span><span class="p">,</span> <span class="v">B</span><span class="p">,</span> <span class="v">C</span><span class="p">,</span> <span class="v">D</span><span class="p">]</span> <span class="o">=</span> <span class="f">tf2ss</span><span class="p">(</span><span class="v">n</span><span class="p">,</span> <span class="v">d</span><span class="p">);</span>
+<span class="v">sys</span> <span class="o">=</span> <span class="f">ss</span><span class="p">(</span><span class="v">A</span><span class="p">,</span> <span class="v">B</span><span class="p">,</span> <span class="v">C</span><span class="p">,</span> <span class="v">D</span><span class="p">);</span>
+
+<span class="p">[</span><span class="v">n2</span><span class="p">,</span> <span class="v">d2</span><span class="p">]</span> <span class="o">=</span> <span class="f">ss2tf</span><span class="p">(</span><span class="v">A</span><span class="p">,</span> <span class="v">B</span><span class="p">,</span> <span class="v">C</span><span class="p">,</span> <span class="v">D</span><span class="p">);</span>
+<span class="v">G2</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="v">n2</span><span class="p">,</span> <span class="v">d2</span><span class="p">);</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'Original TF:'</span><span class="p">);</span>    <span class="v">G</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'State-Space:'</span><span class="p">);</span>   <span class="v">sys</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Converted TF:'</span><span class="p">);</span>  <span class="v">G2</span>
+
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">step</span><span class="p">(</span><span class="v">G</span><span class="p">,</span> <span class="s">'r'</span><span class="p">,</span> <span class="v">G2</span><span class="p">,</span> <span class="s">'b--'</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">legend</span><span class="p">(</span><span class="s">'Original TF'</span><span class="p">,</span> <span class="s">'Converted (SS \rightarrow TF)'</span><span class="p">);</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Step Response — TF vs State-Space Conversion'</span><span class="p">);</span></pre>
+      </div>
+      <div class="info-box"><strong>Note:</strong> The two step responses overlap exactly (red solid under blue dashed), confirming the TF→SS→TF round-trip is lossless. Both <code>G</code> and <code>G2</code> should be identical.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>CONTROL SYSTEMS · MATLAB PRACTICALS · PRACS 01–08</footer>
+
+<script>
+  function toggle(header) {
+    const card = header.closest('.prac');
+    card.classList.toggle('open');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('.nav a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!target.classList.contains('open')) target.querySelector('.prac-header').click();
+      }
+    });
+  });
+</script>
+</body>
+</html>
