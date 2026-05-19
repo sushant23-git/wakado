@@ -1,310 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATLAB Control Systems Lab - Cheat Sheets</title>
-    <style>
-        :root {
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --primary-color: #0076a8; /* MATLAB Blue */
-            --accent-color: #d9531e;  /* MATLAB Orange */
-            --code-bg: #1e1e1e;
-            --code-text: #d4d4d4;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Systems — MATLAB Practicals</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --card: #161a22;
+    --border: #1e2430;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #a8ff3e;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+    --keyword: #ff79c6;
+    --func: #50fa7b;
+    --string: #f1fa8c;
+    --comment: #6272a4;
+    --number: #bd93f9;
+    --operator: #ff6b35;
+  }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        header {
-            background: linear-gradient(135deg, var(--primary-color), #005073);
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-        }
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-        header p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.9;
-            font-style: italic;
-        }
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,229,255,0.05) 0%, transparent 100%);
+  }
 
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
 
-        .prac-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 2.5rem;
-            padding: 1.5rem;
-            border-left: 5px solid var(--primary-color);
-        }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0,229,255,0.3);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
 
-        .prac-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #eeeeee;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
 
-        .prac-title {
-            margin: 0;
-            color: var(--primary-color);
-            font-size: 1.5rem;
-        }
+  h1 span { color: var(--accent); }
 
-        .trick-badge {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border: 1px solid #ffeeba;
-        }
+  .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
 
-        .trick-badge span {
-            color: var(--accent-color);
-        }
+  /* Nav pills */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 32px;
+  }
 
-        pre {
-            background-color: var(--code-bg);
-            color: var(--code-text);
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Courier New', Courier, monospace;
-            font-size: 0.95rem;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-        }
+  .nav a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
 
-        .keyword { color: #569cd6; }
-        .string { color: #ce9178; }
-        .comment { color: #6a9955; font-style: italic; }
-        .number { color: #b5cea8; }
+  .nav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
 
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: #777;
-            font-size: 0.9rem;
-        }
-    </style>
+  /* Main layout */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* Prac card */
+  .prac {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .prac:nth-child(1) { animation-delay: 0.05s; }
+  .prac:nth-child(2) { animation-delay: 0.10s; }
+  .prac:nth-child(3) { animation-delay: 0.15s; }
+  .prac:nth-child(4) { animation-delay: 0.20s; }
+  .prac:nth-child(5) { animation-delay: 0.25s; }
+  .prac:nth-child(6) { animation-delay: 0.30s; }
+  .prac:nth-child(7) { animation-delay: 0.35s; }
+  .prac:nth-child(8) { animation-delay: 0.40s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .prac-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .prac-header:hover { background: rgba(0,229,255,0.03); }
+
+  .prac-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .prac-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.2);
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .prac-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .prac-trick {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    margin-top: 4px;
+    opacity: 0.85;
+  }
+
+  .chevron {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .prac.open .chevron { transform: rotate(180deg); }
+
+  .prac-body {
+    display: none;
+    padding: 0;
+  }
+
+  .prac.open .prac-body { display: block; }
+
+  /* Code block */
+  .code-wrap {
+    position: relative;
+  }
+
+  .code-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--code-bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .copy-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--accent3); border-color: var(--accent3); }
+
+  pre {
+    margin: 0;
+    padding: 24px 24px;
+    background: var(--code-bg);
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  /* Syntax tokens */
+  .k  { color: var(--keyword); font-weight: 600; }   /* keywords */
+  .f  { color: var(--func); }                          /* functions */
+  .s  { color: var(--string); }                        /* strings */
+  .c  { color: var(--comment); font-style: italic; }  /* comments */
+  .n  { color: var(--number); }                        /* numbers */
+  .o  { color: var(--operator); }                      /* operators */
+  .v  { color: #8be9fd; }                              /* variables */
+  .p  { color: var(--text); }                          /* plain */
+
+  /* Info box */
+  .info-box {
+    margin: 0;
+    padding: 16px 28px;
+    background: rgba(168,255,62,0.04);
+    border-top: 1px solid rgba(168,255,62,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    line-height: 1.6;
+  }
+
+  .info-box strong { color: #fff; font-weight: 600; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    header, main { padding-left: 20px; padding-right: 20px; }
+    h1 { font-size: 2rem; }
+    pre { font-size: 11.5px; }
+  }
+</style>
 </head>
 <body>
 
-    <header>
-        <h1>Control Systems Laboratory</h1>
-        <p>Optimized, Clean, and Error-Free MATLAB Scripts</p>
-    </header>
+<header>
+  <div class="header-inner">
+    <div class="tag">EEE / Control Systems</div>
+    <h1>MATLAB<br><span>Practicals</span></h1>
+    <p class="subtitle">// Complete, run-ready code for all 8 practicals.<br>// Click any card to expand. Copy with one click.</p>
+    <nav class="nav">
+      <a href="#p1">P1 Transfer Functions</a>
+      <a href="#p2">P2 Step Response</a>
+      <a href="#p3">P3 Steady State</a>
+      <a href="#p4">P4 Parameter Variation</a>
+      <a href="#p5">P5 Root Locus</a>
+      <a href="#p6">P6 Lead Compensation</a>
+      <a href="#p7">P7 Bode Plot</a>
+      <a href="#p8">P8 State Space</a>
+    </nav>
+  </div>
+</header>
 
-    <div class="container">
+<main>
 
-        <!-- PRACTICAL 1 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 1: Block Diagram Reduction</h2>
-                <div class="trick-badge">Standard Functions</div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>;
-s = <span class="keyword">tf</span>(<span class="string">'s'</span>);
-
-<span class="keyword">disp</span>(<span class="string">'--- Individual Transfer Functions ---'</span>);
-G1 = 1/(s+1)
-G2 = 2/(s+2)
-
-<span class="keyword">disp</span>(<span class="string">'--- Overall Transfer Function (Series) ---'</span>);
-<span class="keyword">series</span>(G1,G2)
-
-<span class="keyword">disp</span>(<span class="string">'--- Overall Transfer Function (Parallel) ---'</span>);
-<span class="keyword">parallel</span>(G1,G2)
-
-<span class="keyword">disp</span>(<span class="string">'--- Overall Transfer Function (Feedback) ---'</span>);
-<span class="keyword">feedback</span>(G1,G2)</pre>
+  <!-- PRAC 1 -->
+  <div class="prac open" id="p1">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 01</span>
+          <span class="prac-title">Individual & Combined Transfer Functions</span>
         </div>
-
-        <!-- PRACTICAL 2 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 2: Step Response</h2>
-                <div class="trick-badge">The Trick: <span>4x Paste fprintf</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>; 
-w = 5; z = 0.5;
-sys = <span class="keyword">tf</span>(w^2, [1 2*z*w w^2]); <span class="comment">% Fixed: added missing '*' operators</span>
-<span class="keyword">disp</span>(<span class="string">'Transfer Function:'</span>); sys
-
-[y,t] = <span class="keyword">step</span>(sys); 
-<span class="keyword">figure</span>; <span class="keyword">plot</span>(t,y,<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,3); <span class="keyword">grid on</span>;
-<span class="keyword">title</span>(<span class="string">'Unit Step Response'</span>); <span class="keyword">xlabel</span>(<span class="string">'Time'</span>); <span class="keyword">ylabel</span>(<span class="string">'Amplitude'</span>);
-
-i = <span class="keyword">stepinfo</span>(sys); 
-<span class="keyword">disp</span>(<span class="string">'--- Unit Step Response Parameters ---'</span>);
-<span class="keyword">fprintf</span>(<span class="string">'Rise Time = %.4f sec\n'</span>, i.RiseTime);
-<span class="keyword">fprintf</span>(<span class="string">'Peak Time = %.4f sec\n'</span>, i.PeakTime);
-<span class="keyword">fprintf</span>(<span class="string">'Settling Time = %.4f sec\n'</span>, i.SettlingTime);
-<span class="keyword">fprintf</span>(<span class="string">'Overshoot = %.2f %%\n'</span>, i.Overshoot);</pre>
-        </div>
-
-        <!-- PRACTICAL 3 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 3: Steady State Errors</h2>
-                <div class="trick-badge">The Trick: <span>The "No IF" Hack</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>; 
-<span class="keyword">syms</span> s; G_s = 10/(s*(s+2));
-<span class="keyword">disp</span>(<span class="string">'Symbolic TF:'</span>); <span class="keyword">pretty</span>(G_s);
-
-s = <span class="keyword">tf</span>(<span class="string">'s'</span>); G = 10/(s*(s+2)); 
-kp = <span class="keyword">dcgain</span>(G); 
-kv = <span class="keyword">dcgain</span>(s*G);   <span class="comment">% Fixed: added '*'</span>
-ka = <span class="keyword">dcgain</span>(s^2*G); <span class="comment">% Fixed: added '*'</span>
-
-<span class="keyword">fprintf</span>(<span class="string">'\nSTEADY STATE ANALYSIS\n\n'</span>);
-<span class="keyword">fprintf</span>(<span class="string">'Position error constant = %g\n'</span>, kp);
-<span class="keyword">fprintf</span>(<span class="string">'Velocity error constant = %g\n'</span>, kv);
-<span class="keyword">fprintf</span>(<span class="string">'Acceleration error constant = %g\n\n'</span>, ka);
-<span class="keyword">fprintf</span>(<span class="string">'Unit Step error = %g\n'</span>, 1/(1+kp));
-<span class="keyword">fprintf</span>(<span class="string">'Ramp error = %g\n'</span>, 1/kv);
-<span class="keyword">fprintf</span>(<span class="string">'Parabolic error = %g\n'</span>, 1/ka);</pre>
-        </div>
-
-        <!-- PRACTICAL 4 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 4: Parameter Variation</h2>
-                <div class="trick-badge">The Trick: <span>The Loop Paste (K, Z, W)</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>; 
-w = 5; z = 0.5;
-
-<span class="comment">% LOOP 1: K</span>
-<span class="keyword">figure</span>; <span class="keyword">hold on</span>; 
-<span class="keyword">for</span> K=[1 5 10]
-    <span class="keyword">step</span>(<span class="keyword">tf</span>(K*w^2, [1 2*z*w K*w^2])); <span class="comment">% Fixed operators</span>
-<span class="keyword">end</span>
-<span class="keyword">legend</span>(<span class="string">'1'</span>,<span class="string">'5'</span>,<span class="string">'10'</span>); <span class="keyword">title</span>(<span class="string">'Varying Gain K'</span>);
-
-<span class="comment">% LOOP 2: ZETA</span>
-<span class="keyword">figure</span>; <span class="keyword">hold on</span>; 
-<span class="keyword">for</span> Z=[0.2 0.5 0.8]
-    <span class="keyword">step</span>(<span class="keyword">tf</span>(w^2, [1 2*Z*w w^2]));     <span class="comment">% Fixed operators</span>
-<span class="keyword">end</span>
-<span class="keyword">legend</span>(<span class="string">'0.2'</span>,<span class="string">'0.5'</span>,<span class="string">'0.8'</span>); <span class="keyword">title</span>(<span class="string">'Varying Zeta (Z)'</span>);
-
-<span class="comment">% LOOP 3: Wn</span>
-<span class="keyword">figure</span>; <span class="keyword">hold on</span>; 
-<span class="keyword">for</span> W=[2 5 8]
-    <span class="keyword">step</span>(<span class="keyword">tf</span>(W^2, [1 2*z*W W^2]));     <span class="comment">% Fixed operators</span>
-<span class="keyword">end</span>
-<span class="keyword">legend</span>(<span class="string">'2'</span>,<span class="string">'5'</span>,<span class="string">'8'</span>); <span class="keyword">title</span>(<span class="string">'Varying Wn (W)'</span>);</pre>
-        </div>
-
-        <!-- PRACTICAL 5 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 5: Root Locus Analysis</h2>
-                <div class="trick-badge">The Trick: <span>The Clean Click (rlocfind)</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>; 
-G = <span class="keyword">tf</span>(1, [1 7 10 0]);
-<span class="keyword">figure</span>; <span class="keyword">rlocus</span>(G); <span class="keyword">grid on</span>; <span class="keyword">title</span>(<span class="string">'Root Locus'</span>);
-
-<span class="keyword">disp</span>(<span class="string">'Click the plot window to select a point!'</span>);
-[K, p] = <span class="keyword">rlocfind</span>(G);
-<span class="keyword">disp</span>(<span class="string">'Selected Gain K:'</span>); <span class="keyword">disp</span>(K); 
-<span class="keyword">disp</span>(<span class="string">'Closed Loop Poles:'</span>); <span class="keyword">disp</span>(p);
-
-T = <span class="keyword">feedback</span>(K*G, 1); 
-<span class="keyword">figure</span>; <span class="keyword">step</span>(T); <span class="keyword">grid on</span>; <span class="keyword">title</span>(<span class="string">'Step Response with Selected Gain'</span>);
-<span class="keyword">disp</span>(<span class="string">'Parameters:'</span>); <span class="keyword">disp</span>(<span class="keyword">stepinfo</span>(T));</pre>
-        </div>
-
-        <!-- PRACTICAL 6 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 6: Lead Compensation</h2>
-                <div class="trick-badge">The Trick: <span>1-Line System Comparison</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>;
-G = <span class="keyword">tf</span>(10, [1 1 0]); 
-Gc = 0.9 * <span class="keyword">tf</span>([1 1], [1 3]);
-
-T1 = <span class="keyword">feedback</span>(G, 1); 
-T2 = <span class="keyword">feedback</span>(<span class="keyword">series</span>(Gc,G), 1);
-
-<span class="keyword">figure</span>; <span class="keyword">step</span>(T1, <span class="string">'r'</span>, T2, <span class="string">'b'</span>); <span class="keyword">grid on</span>;
-<span class="keyword">legend</span>(<span class="string">'Uncompensated'</span>, <span class="string">'Lead Compensated'</span>); 
-<span class="keyword">title</span>(<span class="string">'Step Response Comparison'</span>);</pre>
-        </div>
-
-        <!-- PRACTICAL 7 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 7: Bode Plot Stability</h2>
-                <div class="trick-badge">The Trick: <span>4x Margin Display Paste</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>; 
-G = <span class="keyword">tf</span>(100, [1 22 40 0]);
-<span class="keyword">figure</span>; <span class="keyword">bode</span>(G); <span class="keyword">grid on</span>; <span class="keyword">title</span>(<span class="string">'Bode Plot'</span>);
-
-[GM, PM, Wcg, Wcp] = <span class="keyword">margin</span>(G);
-<span class="keyword">disp</span>(<span class="string">'Gain Margin (Absolute):'</span>); <span class="keyword">disp</span>(GM);
-<span class="keyword">disp</span>(<span class="string">'Phase Margin (Degrees):'</span>); <span class="keyword">disp</span>(PM);
-<span class="keyword">disp</span>(<span class="string">'Gain Crossover Frequency (rad/s):'</span>); <span class="keyword">disp</span>(Wcg);
-<span class="keyword">disp</span>(<span class="string">'Phase Crossover Frequency (rad/s):'</span>); <span class="keyword">disp</span>(Wcp);</pre>
-        </div>
-
-        <!-- PRACTICAL 8 -->
-        <div class="prac-card">
-            <div class="prac-header">
-                <h2 class="prac-title">Practical 8: State Space Conversions</h2>
-                <div class="trick-badge">The Trick: <span>The Transformer Paste</span></div>
-            </div>
-            <pre><span class="keyword">clc</span>; <span class="keyword">clear</span>; <span class="keyword">close all</span>; 
-n = [1 3]; d = [1 5 6]; 
-G = <span class="keyword">tf</span>(n,d);
-
-[A,B,C,D] = <span class="keyword">tf2ss</span>(n,d); 
-sys = <span class="keyword">ss</span>(A,B,C,D);
-
-[n2,d2] = <span class="keyword">ss2tf</span>(A,B,C,D); 
-G2 = <span class="keyword">tf</span>(n2,d2);
-
-<span class="keyword">disp</span>(<span class="string">'--- Original TF ---'</span>); G
-<span class="keyword">disp</span>(<span class="string">'--- State-Space Model ---'</span>); sys
-<span class="keyword">disp</span>(<span class="string">'--- Converted TF back ---'</span>); G2
-
-<span class="keyword">figure</span>; <span class="keyword">step</span>(G, <span class="string">'r'</span>, G2, <span class="string">'b--'</span>); <span class="keyword">grid on</span>; 
-<span class="keyword">legend</span>(<span class="string">'Original'</span>, <span class="string">'Converted'</span>); <span class="keyword">title</span>(<span class="string">'Transformation Validation'</span>);</pre>
-        </div>
-
+        <div class="prac-trick">// series() · parallel() · feedback()</div>
+      </div>
+      <span class="chevron">▾</span>
     </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">s</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="s">'s'</span><span class="p">);</span>
 
-    <footer>
-        <p>Control Systems Lab Companion — Built for speed and execution.</p>
-    </footer>
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Individual Transfer Functions ---'</span><span class="p">);</span>
+<span class="v">G1</span> <span class="o">=</span> <span class="n">1</span><span class="o">/</span><span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">1</span><span class="p">)</span>
+<span class="v">G2</span> <span class="o">=</span> <span class="n">2</span><span class="o">/</span><span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">2</span><span class="p">)</span>
 
-</body>
-</html>
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Overall Transfer Function (Series) ---'</span><span class="p">);</span>
+<span class="f">series</span><span class="p">(</span><span class="v">G1</span><span class="p">,</span> <span class="v">G2</span><span class="p">)</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Overall Transfer Function (Parallel) ---'</span><span class="p">);</span>
+<span class="f">parallel</span><span class="p">(</span><span class="v">G1</span><span class="p">,</span> <span class="v">G2</span><span class="p">)</span>
+
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Overall Transfer Function (Feedback) ---'</span><span class="p">);</span>
+<span class="f">feedback</span><span class="p">(</span><span class="v">G1</span><span class="p">,</span> <span class="v">G2</span><span class="p">)</span></pre>
+      </div>
+      <div class="info-box"><strong>Note:</strong> No changes needed — this prac is already complete and runs as-is.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 2 -->
+  <div class="prac" id="p2">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 02</span>
+          <span class="prac-title">Step Response</span>
+        </div>
+        <div class="prac-trick">// Fixed: 2*z*w (missing multiplication operators)</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">w</span> <span class="o">=</span> <span class="n">5</span><span class="p">;</span>
+<span class="v">z</span> <span class="o">=</span> <span class="n">0.5</span><span class="p">;</span>
+
+<span class="v">sys</span> <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">, [</span><span class="n">1</span>  <span class="n">2</span><span class="o">*</span><span class="v">z</span><span class="o">*</span><span class="v">w</span>  <span class="v">w</span><span class="o">^</span><span class="n">2</span><span class="p">]);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Transfer Function:'</span><span class="p">);</span>
+<span class="v">sys</span>
+
+<span class="p">[</span><span class="v">y</span><span class="p">,</span> <span class="v">t</span><span class="p">]</span> <span class="o">=</span> <span class="f">step</span><span class="p">(</span><span class="v">sys</span><span class="p">);</span>
+<span class="f">figure</span><span class="p">;</span>
+<span class="f">plot</span><span class="p">(</span><span class="v">t</span><span class="p">,</span> <span class="v">y</span><span class="p">,</span> <span class="s">'k'</span><span class="p">,</span> <span class="s">'LineWidth'</span><span class="p">,</span> <span class="n">3</span><span class="p">);</span>
+<span class="f">grid</span> <span class="k">on</span><span class="p">;</span>
+<span class="f">title</span><span class="p">(</span><span class="s">'Unit Step Response'</span><span class="p">);</span>
+<span class="f">xlabel</span><span class="p">(</span><span class="s">'Time'</span><span class="p">);</span>
+<span class="f">ylabel</span><span class="p">(</span><span class="s">'Amplitude'</span><span class="p">);</span>
+
+<span class="v">i</span> <span class="o">=</span> <span class="f">stepinfo</span><span class="p">(</span><span class="v">sys</span><span class="p">);</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'--- Unit Step Response Parameters ---'</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Rise Time     = %.4f sec\n'</span><span class="p">,</span> <span class="v">i</span><span class="p">.</span><span class="v">RiseTime</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Peak Time     = %.4f sec\n'</span><span class="p">,</span> <span class="v">i</span><span class="p">.</span><span class="v">PeakTime</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Settling Time = %.4f sec\n'</span><span class="p">,</span> <span class="v">i</span><span class="p">.</span><span class="v">SettlingTime</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Overshoot     = %.2f %%\n'</span><span class="p">,</span>   <span class="v">i</span><span class="p">.</span><span class="v">Overshoot</span><span class="p">);</span></pre>
+      </div>
+      <div class="info-box"><strong>Fix applied:</strong> <code>2zw</code> → <code>2*z*w</code> and <code>Kw^2</code> → <code>K*w^2</code> (MATLAB requires explicit <code>*</code> for multiplication between variables).</div>
+    </div>
+  </div>
+
+  <!-- PRAC 3 -->
+  <div class="prac" id="p3">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 03</span>
+          <span class="prac-title">Steady State Errors</span>
+        </div>
+        <div class="prac-trick">// Fixed: s*G and s^2*G (missing * operators)</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="f">syms</span> <span class="v">s</span><span class="p">;</span>
+<span class="v">G_s</span> <span class="o">=</span> <span class="n">10</span> <span class="o">/</span> <span class="p">(</span><span class="v">s</span> <span class="o">*</span> <span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">2</span><span class="p">));</span>
+<span class="f">disp</span><span class="p">(</span><span class="s">'Symbolic TF:'</span><span class="p">);</span> <span class="f">pretty</span><span class="p">(</span><span class="v">G_s</span><span class="p">);</span>
+
+<span class="v">s</span>  <span class="o">=</span> <span class="f">tf</span><span class="p">(</span><span class="s">'s'</span><span class="p">);</span>
+<span class="v">G</span>  <span class="o">=</span> <span class="n">10</span> <span class="o">/</span> <span class="p">(</span><span class="v">s</span> <span class="o">*</span> <span class="p">(</span><span class="v">s</span> <span class="o">+</span> <span class="n">2</span><span class="p">));</span>
+<span class="v">kp</span> <span class="o">=</span> <span class="f">dcgain</span><span class="p">(</span><span class="v">G</span><span class="p">);</span>
+<span class="v">kv</span> <span class="o">=</span> <span class="f">dcgain</span><span class="p">(</span><span class="v">s</span> <span class="o">*</span> <span class="v">G</span><span class="p">);</span>
+<span class="v">ka</span> <span class="o">=</span> <span class="f">dcgain</span><span class="p">(</span><span class="v">s</span><span class="o">^</span><span class="n">2</span> <span class="o">*</span> <span class="v">G</span><span class="p">);</span>
+
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'\nSTEADY STATE ANALYSIS\n\n'</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Position error constant    = %g\n'</span><span class="p">,</span> <span class="v">kp</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Velocity error constant    = %g\n'</span><span class="p">,</span> <span class="v">kv</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Acceleration error const   = %g\n\n'</span><span class="p">,</span> <span class="v">ka</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Unit Step error            = %g\n'</span><span class="p">,</span> <span class="n">1</span><span class="o">/</span><span class="p">(</span><span class="n">1</span> <span class="o">+</span> <span class="v">kp</span><span class="p">));</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Ramp error                 = %g\n'</span><span class="p">,</span> <span class="n">1</span><span class="o">/</span><span class="v">kv</span><span class="p">);</span>
+<span class="f">fprintf</span><span class="p">(</span><span class="s">'Parabolic error            = %g\n'</span><span class="p">,</span> <span class="n">1</span><span class="o">/</span><span class="v">ka</span><span class="p">);</span></pre>
+      </div>
+      <div class="info-box"><strong>Fix applied:</strong> <code>sG</code> → <code>s*G</code> and <code>s^2G</code> → <code>s^2*G</code>. The "No IF" trick works because <code>1/Inf = 0</code> naturally in MATLAB — no <code>isinf()</code> checks needed.</div>
+    </div>
+  </div>
+
+  <!-- PRAC 4 -->
+  <div class="prac" id="p4">
+    <div class="prac-header" onclick="toggle(this)">
+      <div>
+        <div class="prac-meta">
+          <span class="prac-num">PRAC 04</span>
+          <span class="prac-title">Parameter Variation</span>
+        </div>
+        <div class="prac-trick">// Fixed: K*w^2, 2*z*w, 2*Z*w, 2*z*W (all multiplication)</div>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="prac-body">
+      <div class="code-wrap">
+        <div class="code-toolbar">
+          <span class="code-lang">MATLAB</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="f">clc</span><span class="p">;</span> <span class="f">clear</span><span class="p">;</span> <span class="f">close</span> <span class="k">all</span><span class="p">;</span>
+<span class="v">w</span> 
